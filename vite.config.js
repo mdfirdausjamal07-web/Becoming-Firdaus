@@ -10,7 +10,7 @@ export default defineConfig({
       includeAssets: ['icons/*.png'],
       manifest: {
         name: 'Becoming Firdaus',
-        short_name: 'BF System',
+        short_name: 'Becoming Firdaus',
         description: 'Inner War Protocol — NEET 2027',
         theme_color: '#04040C',
         background_color: '#04040C',
