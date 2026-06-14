@@ -951,8 +951,8 @@ export default function App() {
                   <input type="number" value={mockMax} onChange={e => setMockMax(e.target.value)}
                     style={{ width:'100%', background:'transparent', border:'none', color:'#7070A0', fontFamily:'Orbitron,monospace', fontSize:14, outline:'none', textAlign:'center' }} />
                 </div>
-                <button onClick={addMock} style={BTN('#FF9933')}>ADD</button>
-              </div>
+                </div>
+              <button onClick={addMock} style={{...BTN('#FF9933'), width:'100%', marginTop:6}}>ADD</button>
               {mocks.slice(0,6).map(m => {
                 const pct = Math.round((m.score/m.max)*100);
                 const col = pct>=80?'#33FF99':pct>=60?'#FF9933':'#FF6666';
