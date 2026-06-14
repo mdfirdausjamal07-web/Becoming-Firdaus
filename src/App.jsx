@@ -947,9 +947,9 @@ export default function App() {
                     style={{ flex:1, background:'transparent', border:'none', color:SUB_C[mockSub], fontFamily:'Orbitron,monospace', fontSize:14, outline:'none', textAlign:'center' }} />
                 </div>
                 <span style={{ alignSelf:'center', color:'#5050A0', fontSize:14 }}>/</span>
-                <div style={{ width:70, display:'flex', alignItems:'center', background:'#0E0E28', border:'1px solid #28285A', borderRadius:8, padding:'8px' }}>
+                <div style={{ flex:1, display:'flex', alignItems:'center', background:'#0E0E28', border:'1px solid #28285A', borderRadius:8, padding:'8px 12px' }}>
                   <input type="number" value={mockMax} onChange={e => setMockMax(e.target.value)}
-                    style={{ width:'100%', background:'transparent', border:'none', color:'#7070A0', fontFamily:'Orbitron,monospace', fontSize:12, outline:'none', textAlign:'center' }} />
+                    style={{ width:'100%', background:'transparent', border:'none', color:'#7070A0', fontFamily:'Orbitron,monospace', fontSize:14, outline:'none', textAlign:'center' }} />
                 </div>
                 <button onClick={addMock} style={BTN('#FF9933')}>ADD</button>
               </div>
