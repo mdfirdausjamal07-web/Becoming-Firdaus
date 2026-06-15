@@ -100,7 +100,7 @@ const getRevNext   = r => r.lastReview ? addDaysTo(r.lastReview, REV_DAYS[Math.m
 
 // ── Share Card ────────────────────────────────────────────────────────────────
 function buildShareCard(player, habits) {
-  const SCALE=2.5, BW=420, QH=44, HDR=230, FTR=90;
+  const SCALE=2.5, BW=420, QH=36, HDR=196, FTR=76;
   const H = HDR + habits.length*QH + FTR;
   const canvas = document.createElement('canvas');
   canvas.width = BW*SCALE; canvas.height = H*SCALE;
@@ -118,85 +118,85 @@ function buildShareCard(player, habits) {
   }
 
   ctx.textAlign = 'center';
-  ctx.fillStyle = '#00D4FF'; ctx.font = 'bold 18px "Courier New",monospace';
-  ctx.fillText('BECOMING', BW/2, 34);
-  ctx.font = 'bold 32px "Courier New",monospace';
-  ctx.fillText('FIRDAUS', BW/2, 70);
-  ctx.fillStyle = '#404080'; ctx.font = '9px "Courier New",monospace';
-  ctx.fillText('INNER WAR PROTOCOL  —  '+todayStr(), BW/2, 88);
+  ctx.fillStyle = '#00D4FF'; ctx.font = 'bold 28px "Courier New",monospace';
+  ctx.fillText('BECOMING FIRDAUS', BW/2, 44);
+  ctx.fillStyle = '#303070'; ctx.font = '9px "Courier New",monospace';
+  ctx.fillText('INNER WAR PROTOCOL  -  NEET 2027', BW/2, 62);
+  ctx.fillStyle = '#1E1E50'; ctx.font = '8px "Courier New",monospace';
+  ctx.fillText(todayStr(), BW/2, 78);
 
   ctx.strokeStyle = '#202045'; ctx.lineWidth = 1;
-  ctx.beginPath(); ctx.moveTo(20,100); ctx.lineTo(BW-20,100); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(20,90); ctx.lineTo(BW-20,90); ctx.stroke();
 
-  let y = 118;
-  ctx.beginPath(); ctx.arc(54,y+24,20,0,Math.PI*2);
+  let y = 108;
+  ctx.beginPath(); ctx.arc(54,y+20,20,0,Math.PI*2);
   ctx.strokeStyle = rank.color; ctx.lineWidth = 2; ctx.stroke();
-  ctx.fillStyle = rank.color+'20'; ctx.fill();
-  ctx.fillStyle = rank.color; ctx.font = 'bold 17px "Courier New",monospace'; ctx.textAlign = 'center';
-  ctx.fillText(rank.name, 54, y+31);
+  ctx.fillStyle = rank.color+"20"; ctx.fill();
+  ctx.fillStyle = rank.color; ctx.font = "bold 16px 'Courier New',monospace"; ctx.textAlign = "center";
+  ctx.fillText(rank.name[0], 54, y+26);
 
-  ctx.textAlign = 'left';
-  ctx.fillStyle = '#F0F0FF'; ctx.font = 'bold 13px "Courier New",monospace';
-  ctx.fillText('Md Firdaus Jamal', 86, y+12);
-  ctx.fillStyle = '#8080CC'; ctx.font = '10px "Courier New",monospace';
-  ctx.fillText(rank.name+'-Rank Warrior  ·  '+player.streak+' day streak 🔥', 86, y+28);
+  ctx.textAlign = "left";
+  ctx.fillStyle = "#F0F0FF"; ctx.font = "bold 14px 'Courier New',monospace";
+  ctx.fillText("Md Firdaus Jamal", 86, y+14);
+  ctx.fillStyle = rank.color; ctx.font = "10px 'Courier New',monospace";
+  ctx.fillText(rank.name+"-Rank Warrior", 86, y+30);
 
-  y += 52;
-  const statsRow = [['Completion',pct+'%'],['XP',player.totalXP.toLocaleString()],['Streak',player.streak+'d 🔥']];
+  y += 50;
+  const statsRow = [["Completion",pct+"%"],["XP",player.totalXP.toLocaleString()],["Streak",player.streak+" days"]];
   statsRow.forEach(([l,v],i) => {
     const x = 20 + i*(BW-40)/3;
-    ctx.fillStyle = '#202045'; ctx.fillRect(x, y, (BW-40)/3-6, 32);
-    ctx.fillStyle = '#6060A0'; ctx.font = '8px "Courier New",monospace'; ctx.textAlign = 'left';
-    ctx.fillText(l, x+6, y+12);
-    ctx.fillStyle = '#00D4FF'; ctx.font = 'bold 13px "Courier New",monospace';
-    ctx.fillText(v, x+6, y+26);
+    ctx.fillStyle = "#0D0D25"; ctx.fillRect(x, y, (BW-40)/3-6, 34);
+    ctx.strokeStyle = "#1E1E45"; ctx.lineWidth = 1; ctx.strokeRect(x, y, (BW-40)/3-6, 34);
+    ctx.fillStyle = "#5050A0"; ctx.font = "8px 'Courier New',monospace"; ctx.textAlign = "left";
+    ctx.fillText(l, x+8, y+13);
+    ctx.fillStyle = "#00D4FF"; ctx.font = "bold 13px 'Courier New',monospace";
+    ctx.fillText(v, x+8, y+27);
   });
 
-  y += 44;
-  ctx.fillStyle = '#141432'; ctx.beginPath(); ctx.roundRect(20,y,BW-40,6,3); ctx.fill();
+  y += 46;
+  ctx.fillStyle = "#141432"; ctx.beginPath(); ctx.roundRect(20,y,BW-40,5,3); ctx.fill();
   if (xpPct > 0) {
     const g = ctx.createLinearGradient(20,0,BW-40,0);
-    g.addColorStop(0, rank.color+'50'); g.addColorStop(1, rank.color);
-    ctx.fillStyle = g; ctx.beginPath(); ctx.roundRect(20,y,(BW-40)*(xpPct/100),6,3); ctx.fill();
+    g.addColorStop(0, rank.color+"50"); g.addColorStop(1, rank.color);
+    ctx.fillStyle = g; ctx.beginPath(); ctx.roundRect(20,y,(BW-40)*(xpPct/100),5,3); ctx.fill();
   }
-  y += 10;
-  ctx.fillStyle = '#6060A0'; ctx.font = '9px "Courier New",monospace'; ctx.textAlign = 'left';
-  ctx.fillText('XP '+player.totalXP.toLocaleString(), 20, y);
-  ctx.textAlign = 'right'; ctx.fillStyle = rank.color;
-  ctx.fillText(nxt ? '→ '+nxt.name+' at '+nxt.minXP.toLocaleString() : 'MAX RANK ✦', BW-20, y);
 
-  y += 18; ctx.strokeStyle = '#202045'; ctx.lineWidth = 1;
+  y += 16; ctx.strokeStyle = "#202045"; ctx.lineWidth = 1;
   ctx.beginPath(); ctx.moveTo(20,y); ctx.lineTo(BW-20,y); ctx.stroke();
   y += 14;
-  ctx.fillStyle = '#6060A0'; ctx.font = '9px "Courier New",monospace'; ctx.textAlign = 'left';
-  ctx.fillText('DAILY QUESTS', 20, y);
-  ctx.textAlign = 'right'; ctx.fillStyle = done===habits.length?'#33FF99':'#33DDFF';
-  ctx.fillText(done+'/'+habits.length, BW-20, y);
-  y += 12;
+
+  ctx.fillStyle = "#5050A0"; ctx.font = "bold 9px 'Courier New',monospace"; ctx.textAlign = "left";
+  ctx.fillText("DAILY QUESTS", 20, y);
+  ctx.textAlign = "right"; ctx.fillStyle = done===habits.length?"#33FF99":"#33DDFF";
+  ctx.fillText(done+"/"+habits.length, BW-20, y);
+  y += 10;
 
   habits.forEach(h => {
-    y += 9;
-    const col = h.completed ? '#33FF99' : '#FF6666';
-    ctx.strokeStyle = col; ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.roundRect(22,y-8,15,15,3); ctx.stroke();
-    ctx.fillStyle = col; ctx.font = 'bold 11px "Courier New",monospace'; ctx.textAlign = 'center';
-    ctx.fillText(h.completed?'✓':'✗', 29, y+3);
-    ctx.textAlign = 'left'; ctx.fillStyle = h.completed?'#D8D8FF':'#505080'; ctx.font = '11px "Courier New",monospace';
-    let nm = h.icon+' '+h.name;
-    while (ctx.measureText(nm).width > BW-100 && nm.length > 8) nm = nm.slice(0,-1);
+    y += 8;
+    const col = h.completed ? "#33FF99" : "#FF6666";
+    ctx.strokeStyle = col+"90"; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.roundRect(22,y-7,14,14,3); ctx.stroke();
+    if (h.completed) { ctx.fillStyle = col+"25"; ctx.fill(); }
+    ctx.fillStyle = col; ctx.font = "bold 10px 'Courier New',monospace"; ctx.textAlign = "center";
+    ctx.fillText(h.completed?"v":"x", 29, y+3);
+    ctx.textAlign = "left";
+    ctx.fillStyle = h.completed ? "#E0E0FF" : "#9090C0";
+    ctx.font = "11px 'Courier New',monospace";
+    let nm = h.icon+" "+h.name;
+    while (ctx.measureText(nm).width > BW-95 && nm.length > 8) nm = nm.slice(0,-1);
     ctx.fillText(nm, 44, y+3);
-    ctx.textAlign = 'right'; ctx.fillStyle = h.completed?SC[h.stat]:'#303060';
-    ctx.font = '9px "Courier New",monospace'; ctx.fillText('+'+h.xp, BW-20, y+3);
-    y += QH-9;
+    ctx.textAlign = "right"; ctx.fillStyle = h.completed?SC[h.stat]:"#404070";
+    ctx.font = "9px 'Courier New',monospace"; ctx.fillText("+"+h.xp, BW-20, y+3);
+    y += QH-8;
   });
 
-  y += 12; ctx.strokeStyle = '#202045'; ctx.lineWidth = 1;
+  y += 14; ctx.strokeStyle = "#202045"; ctx.lineWidth = 1;
   ctx.beginPath(); ctx.moveTo(20,y); ctx.lineTo(BW-20,y); ctx.stroke();
-  y += 18; ctx.fillStyle = '#4040A0'; ctx.font = '10px "Courier New",monospace'; ctx.textAlign = 'center';
-  ctx.fillText('#BecomingFirdaus  #InnerWar  #NEET2027', BW/2, y);
-  y += 16; ctx.fillStyle = '#202040'; ctx.font = '8px "Courier New",monospace';
-  ctx.fillText('becoming-firdaus.system', BW/2, y);
-  return canvas.toDataURL('image/png');
+  y += 16; ctx.fillStyle = "#3030A0"; ctx.font = "9px 'Courier New',monospace"; ctx.textAlign = "center";
+  ctx.fillText("#BecomingFirdaus  #InnerWar  #NEET2027", BW/2, y);
+  y += 14; ctx.fillStyle = "#181835"; ctx.font = "8px 'Courier New',monospace";
+  ctx.fillText("becoming-firdaus.vercel.app", BW/2, y);
+  return canvas.toDataURL("image/png");
 }
 
 // ── App ───────────────────────────────────────────────────────────────────────
