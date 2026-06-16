@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from "react";
+import GoogleAuth from "./GoogleAuth";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 
 // ── Syllabus ──────────────────────────────────────────────────────────────────
@@ -620,6 +621,17 @@ export default function App() {
   const heatCol = pct => { if(pct<0) return '#0D0D1A'; if(pct===0) return '#141428'; if(pct<34) return '#2A1518'; if(pct<67) return '#152035'; if(pct<100) return '#153040'; return '#00CC66'; };
 
   // ── Guard ─────────────────────────────────────────────────────────────────────
+  if (!localStorage.getItem("bf_ref") && !localStorage.getItem("bf_google_uid")) {
+    return (
+      <div style={{ background:"#04040C", minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", flexDirection:"column", padding:24 }}>
+        <div style={{ fontFamily:"Orbitron,monospace", fontSize:20, color:"#33DDFF", marginBottom:8 }}>BECOMING FIRDAUS</div>
+        <div style={{ color:"#5050A0", fontSize:13, marginBottom:32 }}>The Inner War Protocol</div>
+        <GoogleAuth onSignedIn={() => window.location.reload()} />
+        <div style={{ color:"#303060", fontSize:11, marginTop:16 }}>or continue anonymously — just use the app normally</div>
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <div style={{ background:'#04040C', minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center' }}>

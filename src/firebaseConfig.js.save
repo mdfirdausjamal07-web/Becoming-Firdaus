@@ -1,0 +1,102 @@
+nano src/firebaseConfig.js
+
+// src/firebaseConfig.js
+import { initializeApp } from "firebase/app";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInAnonymously, onAuthStateChanged, signOut } from "firebase/auth";
+
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+
+const app = initializeApp(firebaseConfig);
+export const auth = getAuth(app);
+export const googleProvider = new GoogleAuthProvider();
+
+export { signInWithPopup, signInAnonymously, onAuthStateChanged, signOut };
+
+nano src/Auth.jsx
+// src/Auth.jsx
+import { useState, useEffect } from "react";
+import { auth, googleProvider, signInWithPopup, signInAnonymously, onAuthStateChanged, signOut } from "./firebaseConfig";
+
+export default function Auth({ onUserReady }) {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (u) => {
+      setUser(u);
+      setLoading(false);
+      if (u) onUserReady(u);
+    });
+    return unsub;
+  }, []);
+
+  const handleGoogle = async () => {
+    try {
+      await signInWithPopup(auth, googleProvider);
+    } catch (e) {
+      alert("Google sign-in failed: " + e.message);
+    }
+  };
+
+  const handleAnonymous = async () => {
+    try {
+      await signInAnonymously(auth);
+    } catch (e) {
+      alert("Sign in failed: " + e.message);
+    }
+  };
+
+  const handleSignOut = async () => {
+    await signOut(auth);
+    setUser(null);
+  };
+
+  if (loading) return <div style={{padding:"2rem",textAlign:"center"}}>Loading...</div>;
+
+  if (!user) return (
+    <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:"1rem",padding:"3rem"}}>
+      <h2>Becoming Firdaus</h2>
+      <button onClick={handleGoogle} style={btnStyle("#4285F4")}>
+        🔵 Sign in with Google
+      </button>
+      <button onClick={handleAnonymous} style={btnStyle("#555")}>
+        👤 Continue Anonymously
+      </button>
+    </div>
+  );
+
+  return null; // user is signed in, app renders normally
+}
+
+const btnStyle = (bg) => ({
+  background: bg,
+  color: "#fff",
+  border: "none",
+  padding: "0.75rem 1.5rem",
+  borderRadius: "8px",
+  fontSize: "1rem",
+  cursor: "pointer",
+  width: "240px"
+});
+import Auth from "./Auth";
+import { useState } from "react";
+
+// Inside your App component, wrap everything like this:
+function App() {
+  const [user, setUser] = useState(null);
+
+  if (!user) return <Auth onUserReady={setUser} />;
+
+  // ... rest of your existing App code below
+}
+git add .
+git commit -m "Add Google Sign-In"
+git push origin master
+
