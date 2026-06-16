@@ -140,7 +140,7 @@ function buildShareCard(player, habits) {
 
   ctx.textAlign = "left";
   ctx.fillStyle = "#F0F0FF"; ctx.font = "bold 14px 'Courier New',monospace";
-  ctx.fillText("Md Firdaus Jamal", 86, y+14);
+  ctx.fillText("${localStorage.getItem('bf_user_name') || 'Warrior'}", 86, y+14);
   ctx.fillStyle = rank.color; ctx.font = "10px 'Courier New',monospace";
   ctx.fillText(rank.name+"-Rank Warrior", 86, y+30);
 
@@ -621,7 +621,7 @@ export default function App() {
   const heatCol = pct => { if(pct<0) return '#0D0D1A'; if(pct===0) return '#141428'; if(pct<34) return '#2A1518'; if(pct<67) return '#152035'; if(pct<100) return '#153040'; return '#00CC66'; };
 
   // ── Guard ─────────────────────────────────────────────────────────────────────
-  if (!localStorage.getItem("bf_ref") && !localStorage.getItem("bf_google_uid")) {
+  if (!localStorage.getItem("bf_signed_in")) {
     return (
       <div style={{ background:"#04040C", minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", flexDirection:"column", padding:24 }}>
         <div style={{ fontFamily:"Orbitron,monospace", fontSize:20, color:"#33DDFF", marginBottom:8 }}>BECOMING FIRDAUS</div>
@@ -798,7 +798,7 @@ export default function App() {
                   {rank.name}
                 </div>
                 <div style={{ flex:1 }}>
-                  <div className="orb" style={{ fontSize:15, fontWeight:700, marginBottom:3, color:'#F0F0FF' }}>Md Firdaus Jamal</div>
+                  <div className="orb" style={{ fontSize:15, fontWeight:700, marginBottom:3, color:'#F0F0FF' }}>${localStorage.getItem('bf_user_name') || 'Warrior'}</div>
                   <div style={{ ...SEC, marginBottom:10 }}>{rank.name}-Rank Warrior &nbsp;·&nbsp; {player.streak} day streak 🔥</div>
                   <div style={{ display:'flex', justifyContent:'space-between', marginBottom:6 }}>
                     <span className="orb" style={{ fontSize:9, color:'#7070A0' }}>XP {player.totalXP.toLocaleString()}</span>
