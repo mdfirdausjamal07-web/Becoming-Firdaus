@@ -177,12 +177,12 @@ function buildShareCard(player, habits) {
 
   ctx.textAlign = "left";
   ctx.fillStyle = "#F0F0FF"; ctx.font = "bold 14px 'Courier New',monospace";
-  ctx.fillText("${localStorage.getItem('bf_user_name') || 'Warrior'}", 86, y+14);
+  ctx.fillText(localStorage.getItem("bf_user_name") || "Warrior", 86, y+14);
   ctx.fillStyle = rank.color; ctx.font = "10px 'Courier New',monospace";
   ctx.fillText(rank.name+"-Rank Warrior", 86, y+30);
 
   y += 50;
-  const statsRow = [["Completion",pct+"%"],["XP",player.totalXP.toLocaleString()],["Streak",player.streak+" days"]];
+  const statsRow = [["Completion",pct+"%"],["XP",player.totalXP.toLocaleString()],["Streak",player.streak+" 🔥"]];
   statsRow.forEach(([l,v],i) => {
     const x = 20 + i*(BW-40)/3;
     ctx.fillStyle = "#0D0D25"; ctx.fillRect(x, y, (BW-40)/3-6, 34);
