@@ -1,17 +1,16 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { initializeApp, getApps } from "firebase/app";
+import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
-const FB_KEY = 'AIzaSyDU6kehstWmNktdHSI04iv8wHwci-JcWB8';
+const firebaseConfig = {
+  apiKey: 'AIzaSyDU6kehstWmNktdHSI04iv8wHwci-JcWB8',
+  authDomain: "becoming-firdaus-1.firebaseapp.com",
+  projectId: "becoming-firdaus-1",
+};
 
-const getFirebase = async () => {
-  const { initializeApp, getApps } = await import("firebase/app");
+export const initFirebase = () => {
   const apps = getApps();
-  const app = apps.find(a => a.name === 'ga') || initializeApp({
-    apiKey: FB_KEY,
-    authDomain: "becoming-firdaus-1.firebaseapp.com",
-    projectId: "becoming-firdaus-1",
-  }, "ga");
-  const { getAuth, GoogleAuthProvider, signInWithPopup } = await import("firebase/auth");
-  return { auth: getAuth(app), GoogleAuthProvider, signInWithPopup };
+  return apps.find(a => a.name === 'bf') || initializeApp(firebaseConfig, 'bf');
 };
 
 export default function GoogleAuth({ onSignedIn }) {
@@ -25,16 +24,20 @@ export default function GoogleAuth({ onSignedIn }) {
     setLoading(true);
     setError('');
     try {
-      const { auth, GoogleAuthProvider, signInWithPopup } = await getFirebase();
+      const app = initFirebase();
+      const auth = getAuth(app);
       const provider = new GoogleAuthProvider();
       provider.setCustomParameters({ prompt: 'select_account' });
       const result = await signInWithPopup(auth, provider);
+      const token = await result.user.getIdToken();
       localStorage.setItem('bf_google_uid', result.user.uid);
+      localStorage.setItem('bf_google_token', token);
+      localStorage.setItem('bf_token_exp', String(Date.now() + 3500000));
       setUser(result.user);
       setStep('name');
     } catch (e) {
       if (e.code !== 'auth/popup-closed-by-user') {
-        setError(e.message);
+        setError('Sign-in failed. Try again.');
       }
     }
     setLoading(false);
@@ -64,20 +67,12 @@ export default function GoogleAuth({ onSignedIn }) {
     fontFamily:'Inter,sans-serif', marginTop:8,
     boxSizing:'border-box'
   };
-
   const WRAP = {
-    background: BG,
-    height: '100vh',
-    width: '100vw',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 24,
-    boxSizing: 'border-box',
-    overflow: 'hidden',
-    position: 'fixed',
-    top: 0, left: 0,
+    background: BG, height:'100vh', width:'100vw',
+    display:'flex', flexDirection:'column',
+    alignItems:'center', justifyContent:'center',
+    padding:24, boxSizing:'border-box',
+    overflow:'hidden', position:'fixed', top:0, left:0,
   };
 
   if (step === 'name') return (
@@ -98,11 +93,7 @@ export default function GoogleAuth({ onSignedIn }) {
           style={INP}
           autoFocus
         />
-        <button
-          onClick={handleNameSubmit}
-          disabled={!name.trim()}
-          style={BTN('#33DDFF', !name.trim())}
-        >
+        <button onClick={handleNameSubmit} disabled={!name.trim()} style={BTN('#33DDFF', !name.trim())}>
           BEGIN THE WAR →
         </button>
       </div>
@@ -112,34 +103,20 @@ export default function GoogleAuth({ onSignedIn }) {
   return (
     <div style={WRAP}>
       <div style={{ textAlign:'center', marginBottom:32 }}>
-        <div style={{ fontFamily:'Orbitron,monospace', fontSize:8, color:'#252550', letterSpacing:4, marginBottom:8 }}>
-          SYSTEM INITIALIZING
-        </div>
-        <div style={{ fontFamily:'Orbitron,monospace', fontSize:24, fontWeight:900, color:'#33DDFF', letterSpacing:2, marginBottom:6 }}>
-          BECOMING FIRDAUS
-        </div>
-        <div style={{ color:'#404080', fontSize:12, letterSpacing:1 }}>
-          The Inner War Protocol
-        </div>
+        <div style={{ fontFamily:'Orbitron,monospace', fontSize:8, color:'#252550', letterSpacing:4, marginBottom:8 }}>SYSTEM INITIALIZING</div>
+        <div style={{ fontFamily:'Orbitron,monospace', fontSize:24, fontWeight:900, color:'#33DDFF', letterSpacing:2, marginBottom:6 }}>BECOMING FIRDAUS</div>
+        <div style={{ color:'#404080', fontSize:12, letterSpacing:1 }}>The Inner War Protocol</div>
       </div>
-
       <div style={CARD}>
-        <div style={{ fontFamily:'Orbitron,monospace', fontSize:8, color:'#252550', letterSpacing:3, marginBottom:12 }}>
-          AUTHENTICATION REQUIRED
-        </div>
+        <div style={{ fontFamily:'Orbitron,monospace', fontSize:8, color:'#252550', letterSpacing:3, marginBottom:12 }}>AUTHENTICATION REQUIRED</div>
         <div style={{ color:'#606090', fontSize:12, lineHeight:1.7, marginBottom:4 }}>
           Sign in to access your war records across any device.
         </div>
-        {error ? (
-          <div style={{ color:'#FF6666', fontSize:11, marginTop:8, padding:'8px', background:'#FF000011', borderRadius:6 }}>
-            {error}
-          </div>
-        ) : null}
+        {error ? <div style={{ color:'#FF6666', fontSize:11, marginTop:8, padding:'8px', background:'#FF000011', borderRadius:6 }}>{error}</div> : null}
         <button onClick={handleGoogle} disabled={loading} style={BTN('#33DDFF', loading)}>
           {loading ? 'AUTHENTICATING…' : '🔵  SIGN IN WITH GOOGLE'}
         </button>
       </div>
-
       <div style={{ textAlign:'center', marginTop:20, color:'#1A1A35', fontSize:10, fontFamily:'Orbitron,monospace', letterSpacing:1 }}>
         NEET 2027 · THE WAR NEVER ENDS
       </div>
