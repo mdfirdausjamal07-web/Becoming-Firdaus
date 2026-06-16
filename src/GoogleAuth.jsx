@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const FB_KEY = 'AIzaSyDU6kehstWmNktdHSI04iv8wHwci-JcWB8';
 
@@ -8,11 +8,37 @@ export default function GoogleAuth({ onSignedIn }) {
   const [name, setName] = useState('');
   const [user, setUser] = useState(null);
 
+  useEffect(() => {
+    const init = async () => {
+      try {
+        const { initializeApp, getApps } = await import("firebase/app");
+        const { getAuth, getRedirectResult, GoogleAuthProvider } = await import("firebase/auth");
+        const apps = getApps();
+        const app = apps.find(a => a.name === 'google-auth') ||
+          initializeApp({
+            apiKey: FB_KEY,
+            authDomain: "becoming-firdaus-1.firebaseapp.com",
+            projectId: "becoming-firdaus-1",
+          }, "google-auth");
+        const auth = getAuth(app);
+        const result = await getRedirectResult(auth);
+        if (result && result.user) {
+          localStorage.setItem('bf_google_uid', result.user.uid);
+          setUser(result.user);
+          setStep('name');
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    init();
+  }, []);
+
   const handleGoogle = async () => {
     setLoading(true);
     try {
       const { initializeApp, getApps } = await import("firebase/app");
-      const { getAuth, GoogleAuthProvider, signInWithPopup } = await import("firebase/auth");
+      const { getAuth, GoogleAuthProvider, signInWithRedirect } = await import("firebase/auth");
       const apps = getApps();
       const app = apps.find(a => a.name === 'google-auth') ||
         initializeApp({
@@ -22,14 +48,11 @@ export default function GoogleAuth({ onSignedIn }) {
         }, "google-auth");
       const auth = getAuth(app);
       const provider = new GoogleAuthProvider();
-      const result = await signInWithPopup(auth, provider);
-      localStorage.setItem('bf_google_uid', result.user.uid);
-      setUser(result.user);
-      setStep('name');
+      await signInWithRedirect(auth, provider);
     } catch (e) {
-      alert("Google sign-in failed: " + e.message);
+      alert("Sign-in failed: " + e.message);
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleNameSubmit = () => {
@@ -82,7 +105,7 @@ export default function GoogleAuth({ onSignedIn }) {
             Your data is tied to your account. Sign in to access your war records across any device.
           </div>
           <button onClick={handleGoogle} disabled={loading} style={BTN('#33DDFF')}>
-            {loading ? 'AUTHENTICATING…' : '🔵  SIGN IN WITH GOOGLE'}
+            {loading ? 'REDIRECTING…' : '🔵  SIGN IN WITH GOOGLE'}
           </button>
         </div>
 
