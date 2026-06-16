@@ -798,7 +798,7 @@ export default function App() {
                   {rank.name}
                 </div>
                 <div style={{ flex:1 }}>
-                  <div className="orb" style={{ fontSize:15, fontWeight:700, marginBottom:3, color:'#F0F0FF' }}>${localStorage.getItem('bf_user_name') || 'Warrior'}</div>
+                  <div className="orb" style={{ fontSize:15, fontWeight:700, marginBottom:3, color:'#F0F0FF' }}>{localStorage.getItem('bf_user_name') || 'Warrior'}</div>
                   <div style={{ ...SEC, marginBottom:10 }}>{rank.name}-Rank Warrior &nbsp;·&nbsp; {player.streak} day streak 🔥</div>
                   <div style={{ display:'flex', justifyContent:'space-between', marginBottom:6 }}>
                     <span className="orb" style={{ fontSize:9, color:'#7070A0' }}>XP {player.totalXP.toLocaleString()}</span>
