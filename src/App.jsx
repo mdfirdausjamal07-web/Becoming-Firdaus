@@ -119,6 +119,7 @@ const safeGet = async k => {
 const safeSet = async (k, v) => {
   try {
     const t = await getToken();
+    console.log('SAVE:', getBase()+'/'+k, 'token:', !!t);
     await fetch(`${getBase()}/${k}?key=${FB_KEY}&updateMask.fieldPaths=value`, {
       method: 'PATCH',
       headers: {'Content-Type':'application/json', ...(t ? {Authorization:'Bearer '+t} : {})},
