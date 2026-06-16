@@ -119,7 +119,11 @@ const safeGet = async k => {
 const safeSet = async (k, v) => {
   try {
     const t = await getToken();
-    console.log('SAVE:', getBase()+'/'+k, 'token:', !!t);
+    const url = `${getBase()}/${k}?key=${FB_KEY}&updateMask.fieldPaths=value`;
+    const resp = await fetch(url, {method:'PATCH',headers:{'Content-Type':'application/json',...(t?{Authorization:'Bearer '+t}:{})},body:JSON.stringify({fields:{value:{stringValue:JSON.stringify(v)}}})});
+    const result = await resp.json();
+    if (!resp.ok) alert('SAVE ERROR: '+JSON.stringify(result).slice(0,200));
+    return;
     await fetch(`${getBase()}/${k}?key=${FB_KEY}&updateMask.fieldPaths=value`, {
       method: 'PATCH',
       headers: {'Content-Type':'application/json', ...(t ? {Authorization:'Bearer '+t} : {})},
