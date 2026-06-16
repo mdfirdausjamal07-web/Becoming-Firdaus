@@ -47,7 +47,7 @@ export default function GoogleAuth({ onSignedIn }) {
     if (!name.trim()) return;
     localStorage.setItem('bf_user_name', name.trim());
     localStorage.setItem('bf_signed_in', 'true');
-    onSignedIn(user, name.trim());
+    window.location.reload();
   };
 
   const BG = '#04040C';
