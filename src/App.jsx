@@ -90,7 +90,7 @@ const getXPPct     = xp => { const c=getRank(xp),n=getNextRank(xp); if(!n) retur
 const FB_KEY  = 'AIzaSyDU6kehstWmNktdHSI04iv8wHwci-JcWB8';
 const getBase = () => `https://firestore.googleapis.com/v1/projects/becoming-firdaus-1/databases/(default)/documents/storage/${localStorage.getItem("bf_google_uid") || "anonymous"}`;
 let _tok=null,_tokExp=0;
-const getToken=async()=>{const now=Date.now();if(_tok&&now<_tokExp-60000)return _tok;try{const {initializeApp,getApps}=await import("firebase/app");const {getAuth}=await import("firebase/auth");const apps=getApps();const app=apps.find(a=>a.name==="ga");if(!app)return null;const auth=getAuth(app);const u=auth.currentUser;if(!u)return null;_tok=await u.getIdToken();_tokExp=now+3500000;return _tok;}catch{return null;}};
+const getToken=async()=>{return localStorage.getItem("bf_google_token")||null;};
 const safeGet = async k => { try { const t=await getToken(); const r=await fetch(`${getBase()}/${k}?key=${FB_KEY}`,{headers:t?{Authorization:"Bearer "+t}:{}}); if(!r.ok) return null; const d=await r.json(); const v=d?.fields?.value?.stringValue; return v?JSON.parse(v):null; } catch { return null; } };
 const safeSet = async (k,v) => { try { const t=await getToken(); await fetch(`${getBase()}/${k}?key=${FB_KEY}&updateMask.fieldPaths=value`,{method:"PATCH",headers:{"Content-Type":"application/json",...(t?{Authorization:"Bearer "+t}:{})},body:JSON.stringify({fields:{value:{stringValue:JSON.stringify(v)}}})}); } catch {} };
 
