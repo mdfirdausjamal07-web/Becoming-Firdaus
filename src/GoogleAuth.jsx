@@ -7,10 +7,27 @@ const firebaseConfig = {
   authDomain: "becoming-firdaus-1.firebaseapp.com",
   projectId: "becoming-firdaus-1",
 };
+const FB_KEY = 'AIzaSyDU6kehstWmNktdHSI04iv8wHwci-JcWB8';
+const FB_PROJECT = 'becoming-firdaus-1';
 
 export const initFirebase = () => {
   const apps = getApps();
   return apps.find(a => a.name === 'bf') || initializeApp(firebaseConfig, 'bf');
+};
+
+export const fetchNameFromFirebase = async (uid, token) => {
+  try {
+    const r = await fetch(`https://firestore.googleapis.com/v1/projects/${FB_PROJECT}/databases/(default)/documents/users/${uid}/profile/info?key=${FB_KEY}`, { headers: token ? { Authorization: 'Bearer ' + token } : {} });
+    if (!r.ok) return null;
+    const d = await r.json();
+    return d?.fields?.name?.stringValue || null;
+  } catch { return null; }
+};
+
+export const saveNameToFirebase = async (uid, token, name) => {
+  try {
+    await fetch(`https://firestore.googleapis.com/v1/projects/${FB_PROJECT}/databases/(default)/documents/users/${uid}/profile/info?key=${FB_KEY}&updateMask.fieldPaths=name`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) }, body: JSON.stringify({ fields: { name: { stringValue: name } } }) });
+  } catch {}
 };
 
 export default function GoogleAuth({ onSignedIn }) {
@@ -19,138 +36,86 @@ export default function GoogleAuth({ onSignedIn }) {
   const [name, setName] = useState('');
   const [error, setError] = useState('');
   const [welcomeName, setWelcomeName] = useState('');
+  const [token, setToken] = useState('');
+  const [uid, setUid] = useState('');
 
   const handleGoogle = async () => {
-    setLoading(true);
-    setError('');
+    setLoading(true); setError('');
     try {
       const app = initFirebase();
       const auth = getAuth(app);
       const provider = new GoogleAuthProvider();
       provider.setCustomParameters({ prompt: 'select_account' });
       const result = await signInWithPopup(auth, provider, browserPopupRedirectResolver);
-      const token = await result.user.getIdToken();
-      localStorage.setItem('bf_google_uid', result.user.uid);
-      localStorage.setItem('bf_google_token', token);
-      localStorage.setItem('bf_token_exp', String(Date.now() + 3500000));
-      const savedName = localStorage.getItem('bf_user_name');
-      if (savedName) {
-        setWelcomeName(savedName);
-        setStep('welcome');
-      } else {
-        setStep('name');
-      }
-    } catch (e) {
-      if (e.code !== 'auth/popup-closed-by-user') {
-        setError('Sign-in failed: ' + e.code);
-      }
-    }
+      const tok = await result.user.getIdToken();
+      const userId = result.user.uid;
+      localStorage.setItem('bf_google_uid', userId);
+      localStorage.setItem('bf_google_token', tok);
+      setToken(tok); setUid(userId);
+      const savedName = await fetchNameFromFirebase(userId, tok);
+      if (savedName) { localStorage.setItem('bf_user_name', savedName); setWelcomeName(savedName); setStep('welcome'); }
+      else { setStep('name'); }
+    } catch (e) { if (e.code !== 'auth/popup-closed-by-user') setError('Sign-in failed: ' + e.code); }
     setLoading(false);
   };
 
-  const handleNameSubmit = () => {
+  const handleNameSubmit = async () => {
     if (!name.trim()) return;
+    await saveNameToFirebase(uid, token, name.trim());
     localStorage.setItem('bf_user_name', name.trim());
     localStorage.setItem('bf_signed_in', 'true');
     window.location.reload();
   };
 
-  const handleEnter = () => {
-    localStorage.setItem('bf_signed_in', 'true');
-    window.location.reload();
-  };
+  const handleEnter = () => { localStorage.setItem('bf_signed_in', 'true'); window.location.reload(); };
 
   const BG = '#04040C';
   const CARD = { background:'#0A0A1E', border:'1px solid #22224A', borderRadius:16, padding:24, width:'100%', maxWidth:360 };
-  const BTN = (col, disabled) => ({
-    width:'100%', background: disabled ? '#111122' : col+'22',
-    border:'1px solid '+(disabled ? '#222244' : col+'55'),
-    color: disabled ? '#333366' : col,
-    borderRadius:10, padding:'13px', fontSize:12,
-    cursor: disabled ? 'not-allowed' : 'pointer',
-    fontFamily:'Orbitron,monospace', letterSpacing:2, marginTop:12
-  });
-  const INP = {
-    background:'#0E0E28', border:'1px solid #28285A',
-    borderRadius:8, padding:'12px', color:'#F0F0FF',
-    fontSize:14, outline:'none', width:'100%',
-    fontFamily:'Inter,sans-serif', marginTop:8,
-    boxSizing:'border-box'
-  };
-  const WRAP = {
-    background: BG, height:'100vh', width:'100vw',
-    display:'flex', flexDirection:'column',
-    alignItems:'center', justifyContent:'center',
-    padding:24, boxSizing:'border-box',
-    overflow:'hidden', position:'fixed', top:0, left:0,
-  };
+  const BTN = (col, disabled) => ({ width:'100%', background: disabled?'#111122':col+'22', border:'1px solid '+(disabled?'#222244':col+'55'), color:disabled?'#333366':col, borderRadius:10, padding:'13px', fontSize:12, cursor:disabled?'not-allowed':'pointer', fontFamily:'Orbitron,monospace', letterSpacing:2, marginTop:12 });
+  const INP = { background:'#0E0E28', border:'1px solid #28285A', borderRadius:8, padding:'12px', color:'#F0F0FF', fontSize:14, outline:'none', width:'100%', fontFamily:'Inter,sans-serif', marginTop:8, boxSizing:'border-box' };
+  const WRAP = { background:BG, height:'100vh', width:'100vw', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:24, boxSizing:'border-box', overflow:'hidden', position:'fixed', top:0, left:0 };
 
-  if (step === 'welcome') return (
+  if (step==='welcome') return (
     <div style={WRAP}>
-      <div style={{ ...CARD, textAlign:'center' }}>
-        <div style={{ fontSize:48, marginBottom:16 }}>⚔️</div>
-        <div style={{ fontFamily:'Orbitron,monospace', fontSize:10, color:'#303065', letterSpacing:4, marginBottom:12 }}>
-          WARRIOR RETURNING
-        </div>
-        <div style={{ fontFamily:'Orbitron,monospace', fontSize:22, fontWeight:900, color:'#33DDFF', marginBottom:8 }}>
-          WELCOME BACK
-        </div>
-        <div style={{ fontFamily:'Orbitron,monospace', fontSize:18, color:'#F0F0FF', marginBottom:16 }}>
-          {welcomeName}
-        </div>
-        <div style={{ color:'#404080', fontSize:12, lineHeight:1.7, marginBottom:8 }}>
-          The war continues. Your records await.
-        </div>
-        <button onClick={handleEnter} style={BTN('#33DDFF', false)}>
-          ENTER THE WAR →
-        </button>
+      <div style={{...CARD, textAlign:'center'}}>
+        <div style={{fontSize:48, marginBottom:16}}>⚔️</div>
+        <div style={{fontFamily:'Orbitron,monospace', fontSize:10, color:'#303065', letterSpacing:4, marginBottom:12}}>WARRIOR RETURNING</div>
+        <div style={{fontFamily:'Orbitron,monospace', fontSize:22, fontWeight:900, color:'#33DDFF', marginBottom:8}}>WELCOME BACK</div>
+        <div style={{fontFamily:'Orbitron,monospace', fontSize:18, color:'#F0F0FF', marginBottom:16}}>{welcomeName}</div>
+        <div style={{color:'#404080', fontSize:12, lineHeight:1.7, marginBottom:8}}>The war continues. Your records await.</div>
+        <button onClick={handleEnter} style={BTN('#33DDFF', false)}>ENTER THE WAR →</button>
       </div>
     </div>
   );
 
-  if (step === 'name') return (
+  if (step==='name') return (
     <div style={WRAP}>
-      <div style={{ ...CARD, textAlign:'center' }}>
-        <div style={{ fontSize:36, marginBottom:10 }}>⚔️</div>
-        <div style={{ fontFamily:'Orbitron,monospace', fontSize:16, color:'#33DDFF', marginBottom:6 }}>
-          WARRIOR IDENTIFIED
-        </div>
-        <div style={{ color:'#5050A0', fontSize:12, marginBottom:20, lineHeight:1.6 }}>
-          Welcome. What shall we call you?
-        </div>
-        <input
-          value={name}
-          onChange={e => setName(e.target.value)}
-          onKeyDown={e => e.key==='Enter' && handleNameSubmit()}
-          placeholder="Enter your name…"
-          style={INP}
-          autoFocus
-        />
-        <button onClick={handleNameSubmit} disabled={!name.trim()} style={BTN('#33DDFF', !name.trim())}>
-          BEGIN THE WAR →
-        </button>
+      <div style={{...CARD, textAlign:'center'}}>
+        <div style={{fontSize:36, marginBottom:10}}>⚔️</div>
+        <div style={{fontFamily:'Orbitron,monospace', fontSize:16, color:'#33DDFF', marginBottom:6}}>WARRIOR IDENTIFIED</div>
+        <div style={{color:'#5050A0', fontSize:12, marginBottom:20, lineHeight:1.6}}>Welcome. What shall we call you?</div>
+        <input value={name} onChange={e=>setName(e.target.value)} onKeyDown={e=>e.key==='Enter'&&handleNameSubmit()} placeholder="Enter your name…" style={INP} autoFocus />
+        <button onClick={handleNameSubmit} disabled={!name.trim()} style={BTN('#33DDFF', !name.trim())}>BEGIN THE WAR →</button>
       </div>
     </div>
   );
 
   return (
     <div style={WRAP}>
-      <div style={{ textAlign:'center', marginBottom:32 }}>
-        <div style={{ fontFamily:'Orbitron,monospace', fontSize:8, color:'#252550', letterSpacing:4, marginBottom:8 }}>SYSTEM INITIALIZING</div>
-        <div style={{ fontFamily:'Orbitron,monospace', fontSize:24, fontWeight:900, color:'#33DDFF', letterSpacing:2, marginBottom:6 }}>BECOMING FIRDAUS</div>
-        <div style={{ color:'#404080', fontSize:12, letterSpacing:1 }}>The Inner War Protocol</div>
+      <div style={{textAlign:'center', marginBottom:32}}>
+        <div style={{fontFamily:'Orbitron,monospace', fontSize:8, color:'#252550', letterSpacing:4, marginBottom:8}}>SYSTEM INITIALIZING</div>
+        <div style={{fontFamily:'Orbitron,monospace', fontSize:24, fontWeight:900, color:'#33DDFF', letterSpacing:2, marginBottom:6}}>BECOMING FIRDAUS</div>
+        <div style={{color:'#404080', fontSize:12, letterSpacing:1}}>The Inner War Protocol</div>
       </div>
       <div style={CARD}>
-        <div style={{ fontFamily:'Orbitron,monospace', fontSize:8, color:'#252550', letterSpacing:3, marginBottom:12 }}>AUTHENTICATION REQUIRED</div>
-        <div style={{ color:'#606090', fontSize:12, lineHeight:1.7, marginBottom:4 }}>
-          Sign in to access your war records across any device.
-        </div>
-        {error ? <div style={{ color:'#FF6666', fontSize:11, marginTop:8, padding:'8px', background:'#FF000011', borderRadius:6 }}>{error}</div> : null}
+        <div style={{fontFamily:'Orbitron,monospace', fontSize:8, color:'#252550', letterSpacing:3, marginBottom:12}}>AUTHENTICATION REQUIRED</div>
+        <div style={{color:'#606090', fontSize:12, lineHeight:1.7, marginBottom:4}}>Sign in to access your war records across any device.</div>
+        {error?<div style={{color:'#FF6666', fontSize:11, marginTop:8, padding:'8px', background:'#FF000011', borderRadius:6}}>{error}</div>:null}
         <button onClick={handleGoogle} disabled={loading} style={BTN('#33DDFF', loading)}>
-          {loading ? 'AUTHENTICATING…' : '🔵  SIGN IN WITH GOOGLE'}
+          {loading?'AUTHENTICATING…':'🔵  SIGN IN WITH GOOGLE'}
         </button>
       </div>
-      <div style={{ textAlign:'center', marginTop:20, color:'#1A1A35', fontSize:10, fontFamily:'Orbitron,monospace', letterSpacing:1 }}>
+      <div style={{textAlign:'center', marginTop:20, color:'#1A1A35', fontSize:10, fontFamily:'Orbitron,monospace', letterSpacing:1}}>
         NEET 2027 · THE WAR NEVER ENDS
       </div>
     </div>

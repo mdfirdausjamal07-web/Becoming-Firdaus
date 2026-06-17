@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import GoogleAuth from "./GoogleAuth";
+import SettingsPanel from "./SettingsPanel";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 
 // ── Syllabus ──────────────────────────────────────────────────────────────────
@@ -1637,6 +1638,18 @@ export default function App() {
           </div>
         )}
 
+
+        {tab==='settings' && (
+          <div>
+            <div style={{ background:'#0A0A1E', border:'1px solid #22224A', borderRadius:12, padding:16, marginBottom:14 }}>
+              <span style={{ fontFamily:'Orbitron,monospace', fontSize:9, color:'#7070B0', letterSpacing:3, marginBottom:12, display:'block' }}>WARRIOR PROFILE</span>
+              <div style={{ fontSize:13, color:'#9090C0', marginBottom:16 }}>
+                Signed in as: <span style={{ color:'#33DDFF' }}>{localStorage.getItem('bf_user_name')||'Warrior'}</span>
+              </div>
+              <SettingsPanel />
+            </div>
+          </div>
+        )}
       </div>
 
       {/* ─────────────────── BOTTOM NAV ─────────────────── */}
@@ -1647,6 +1660,7 @@ export default function App() {
           { id:'body',  icon:'💪', label:'FITNESS' },
           { id:'log',   icon:'📊', label:'LOG' },
           { id:'goals', icon:'🎯', label:'GOALS' },
+          { id:'settings', icon:'⚙️', label:'SETTINGS' },
         ].map(t => (
           <button key={t.id} onClick={() => setTab(t.id)} style={NAV(tab===t.id)}>
             <div style={{ fontSize:18, marginBottom:1 }}>{t.icon}</div>
