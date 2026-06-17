@@ -17,8 +17,8 @@ export default function GoogleAuth({ onSignedIn }) {
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState('login');
   const [name, setName] = useState('');
-  const [user, setUser] = useState(null);
   const [error, setError] = useState('');
+  const [welcomeName, setWelcomeName] = useState('');
 
   const handleGoogle = async () => {
     setLoading(true);
@@ -33,8 +33,13 @@ export default function GoogleAuth({ onSignedIn }) {
       localStorage.setItem('bf_google_uid', result.user.uid);
       localStorage.setItem('bf_google_token', token);
       localStorage.setItem('bf_token_exp', String(Date.now() + 3500000));
-      setUser(result.user);
-      setStep('name');
+      const savedName = localStorage.getItem('bf_user_name');
+      if (savedName) {
+        setWelcomeName(savedName);
+        setStep('welcome');
+      } else {
+        setStep('name');
+      }
     } catch (e) {
       if (e.code !== 'auth/popup-closed-by-user') {
         setError('Sign-in failed: ' + e.code);
@@ -46,6 +51,11 @@ export default function GoogleAuth({ onSignedIn }) {
   const handleNameSubmit = () => {
     if (!name.trim()) return;
     localStorage.setItem('bf_user_name', name.trim());
+    localStorage.setItem('bf_signed_in', 'true');
+    window.location.reload();
+  };
+
+  const handleEnter = () => {
     localStorage.setItem('bf_signed_in', 'true');
     window.location.reload();
   };
@@ -74,6 +84,29 @@ export default function GoogleAuth({ onSignedIn }) {
     padding:24, boxSizing:'border-box',
     overflow:'hidden', position:'fixed', top:0, left:0,
   };
+
+  if (step === 'welcome') return (
+    <div style={WRAP}>
+      <div style={{ ...CARD, textAlign:'center' }}>
+        <div style={{ fontSize:48, marginBottom:16 }}>⚔️</div>
+        <div style={{ fontFamily:'Orbitron,monospace', fontSize:10, color:'#303065', letterSpacing:4, marginBottom:12 }}>
+          WARRIOR RETURNING
+        </div>
+        <div style={{ fontFamily:'Orbitron,monospace', fontSize:22, fontWeight:900, color:'#33DDFF', marginBottom:8 }}>
+          WELCOME BACK
+        </div>
+        <div style={{ fontFamily:'Orbitron,monospace', fontSize:18, color:'#F0F0FF', marginBottom:16 }}>
+          {welcomeName}
+        </div>
+        <div style={{ color:'#404080', fontSize:12, lineHeight:1.7, marginBottom:8 }}>
+          The war continues. Your records await.
+        </div>
+        <button onClick={handleEnter} style={BTN('#33DDFF', false)}>
+          ENTER THE WAR →
+        </button>
+      </div>
+    </div>
+  );
 
   if (step === 'name') return (
     <div style={WRAP}>
