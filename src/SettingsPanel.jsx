@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { fetchNameFromFirebase, saveNameToFirebase } from "./GoogleAuth";
+import { saveNameToFirebase } from "./GoogleAuth";
 
-export default function SettingsPanel() {
+export default function SettingsPanel({ onShowHistory, onExport }) {
   const [editingName, setEditingName] = useState(false);
   const [newName, setNewName] = useState('');
   const [saving, setSaving] = useState(false);
+  const [confirmSignOut, setConfirmSignOut] = useState(false);
 
   const uid = localStorage.getItem('bf_google_uid');
   const token = localStorage.getItem('bf_google_token');
@@ -20,21 +21,21 @@ export default function SettingsPanel() {
     window.location.reload();
   };
 
-  const [confirmSignOut, setConfirmSignOut] = useState(false);
-
   const handleSignOut = () => {
     localStorage.clear();
     window.location.reload();
   };
 
-  const CARD = { background:'#0A0A1E', border:'1px solid #22224A', borderRadius:12, padding:16, marginBottom:12 };
+  const CARD = { background:'#0E0E28', border:'1px solid #1A1A38', borderRadius:12, padding:16, marginBottom:12 };
   const BTN = (col) => ({ background:col+'22', border:'1px solid '+col+'55', color:col, borderRadius:8, padding:'10px 16px', fontSize:11, cursor:'pointer', fontFamily:'Orbitron,monospace', letterSpacing:1 });
-  const INP = { background:'#0E0E28', border:'1px solid #28285A', borderRadius:8, padding:'10px', color:'#F0F0FF', fontSize:13, outline:'none', width:'100%', fontFamily:'Inter,sans-serif', boxSizing:'border-box', marginBottom:10 };
+  const WBTN = (col) => ({ ...BTN(col), width:'100%', padding:'12px', fontSize:11, marginBottom:10, display:'block', textAlign:'center' });
+  const INP = { background:'#0A0A1E', border:'1px solid #28285A', borderRadius:8, padding:'10px', color:'#F0F0FF', fontSize:13, outline:'none', width:'100%', fontFamily:'Inter,sans-serif', boxSizing:'border-box', marginBottom:10 };
 
   return (
     <div>
+      {/* Edit Name */}
       <div style={CARD}>
-        <div style={{ fontFamily:'Orbitron,monospace', fontSize:9, color:'#7070B0', letterSpacing:3, marginBottom:12 }}>EDIT NAME</div>
+        <div style={{ fontFamily:'Orbitron,monospace', fontSize:9, color:'#7070B0', letterSpacing:3, marginBottom:12 }}>WARRIOR NAME</div>
         {editingName ? (
           <div>
             <input value={newName} onChange={e=>setNewName(e.target.value)} placeholder={currentName} style={INP} autoFocus />
@@ -51,10 +52,18 @@ export default function SettingsPanel() {
         )}
       </div>
 
+      {/* History */}
+      <div style={CARD}>
+        <div style={{ fontFamily:'Orbitron,monospace', fontSize:9, color:'#7070B0', letterSpacing:3, marginBottom:12 }}>DATA</div>
+        <button onClick={onShowHistory} style={WBTN('#33DDFF')}>📅 ALL TIME HISTORY</button>
+        <button onClick={onExport} style={WBTN('#33FF99')}>⬇ EXPORT DATA BACKUP</button>
+      </div>
+
+      {/* Account */}
       <div style={CARD}>
         <div style={{ fontFamily:'Orbitron,monospace', fontSize:9, color:'#7070B0', letterSpacing:3, marginBottom:12 }}>ACCOUNT</div>
-        <div style={{ fontSize:12, color:'#606090', marginBottom:12 }}>
-          UID: <span style={{ color:'#303060', fontSize:10 }}>{uid?.slice(0,16)}...</span>
+        <div style={{ fontSize:11, color:'#404060', marginBottom:12 }}>
+          UID: {uid?.slice(0,20)}...
         </div>
         {confirmSignOut ? (
           <div>
@@ -69,10 +78,11 @@ export default function SettingsPanel() {
         )}
       </div>
 
+      {/* App info */}
       <div style={{ ...CARD, textAlign:'center' }}>
-        <div style={{ fontFamily:'Orbitron,monospace', fontSize:9, color:'#7070B0', letterSpacing:3, marginBottom:8 }}>BECOMING FIRDAUS</div>
-        <div style={{ fontSize:11, color:'#303060' }}>Inner War Protocol · NEET 2027</div>
-        <div style={{ fontSize:10, color:'#202040', marginTop:4 }}>v1.0 · Personal Edition</div>
+        <div style={{ fontFamily:'Orbitron,monospace', fontSize:9, color:'#303060', letterSpacing:3, marginBottom:6 }}>BECOMING FIRDAUS</div>
+        <div style={{ fontSize:11, color:'#252545' }}>Inner War Protocol · NEET 2027</div>
+        <div style={{ fontSize:10, color:'#1A1A35', marginTop:4 }}>v1.0 · Personal Edition</div>
       </div>
     </div>
   );

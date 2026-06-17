@@ -179,6 +179,8 @@ function buildShareCard(player, habits) {
   ctx.textAlign = "left";
   ctx.fillStyle = "#F0F0FF"; ctx.font = "bold 14px 'Courier New',monospace";
   ctx.fillText(localStorage.getItem("bf_user_name") || "Warrior", 86, y+14);
+  ctx.fillStyle = "#303065"; ctx.font = "9px 'Courier New',monospace";
+  ctx.fillText("DAY "+getDayOfWar(player.firstDate)+" · THE INNER WAR", 86, y+44);
   ctx.fillStyle = rank.color; ctx.font = "10px 'Courier New',monospace";
   ctx.fillText(rank.name+"-Rank Warrior", 86, y+30);
 
@@ -252,6 +254,7 @@ export default function App() {
   const [penWarn,      setPenWarn]      = useState(null);
   const [shareImg,     setShareImg]     = useState(null);
   const [longPressId, setLongPressId] = useState(null);
+  const [showHistory, setShowHistory] = useState(false);
   const [loading,      setLoading]      = useState(true);
 
   const [addOpen, setAddOpen] = useState(false);
@@ -910,14 +913,7 @@ export default function App() {
               </div>
             </div>
 
-            <div style={CARD}>
-              <span style={LBL}>END OF DAY REFLECTION</span>
-              {savedReflection && <div style={{ ...SEC, marginBottom:10, padding:'8px 12px', background:'#33FF9910', borderRadius:8, borderLeft:'3px solid #33FF99', color:'#33FF99' }}>"{savedReflection}"</div>}
-              <div style={{ display:'flex', gap:8 }}>
-                <input value={reflection} onChange={e => setReflection(e.target.value)} placeholder="How did today go? One honest sentence…" style={{ flex:1, ...INP, marginBottom:0 }} />
-                <button onClick={saveReflection} style={BTN('#33FF99')}>SAVE</button>
-              </div>
-            </div>
+
           </div>
         )}
 
@@ -1390,72 +1386,6 @@ export default function App() {
                 )}
                 <div style={{ fontSize:13, lineHeight:1.75, color:'#C8C8E8', whiteSpace:'pre-wrap' }}>{n.text}</div>
               </div>
-            ))}
-
-            <div style={CARD}>
-              <span style={LBL}>ALL-TIME HISTORY</span>
-              {histDates.length === 0
-                ? <div style={{ ...DIM, textAlign:'center', padding:'40px 0', color:'#404080' }}>No history yet.</div>
-                : histDates.map(date => {
-                    const s   = summary[date];
-                    const pct = s.total>0 ? Math.round((s.completed/s.total)*100) : 0;
-                    const col = pct===100?'#33FF99':pct>=60?'#33DDFF':pct>=30?'#FF9933':'#FF6666';
-                    const isOpen = expandedDate===date;
-                    const detail = histDetail[date];
-                    const dayNote = notes.find(n => n.date===date);
-                    return (
-                      <div key={date}>
-                        <div className="hr" onClick={() => openHistory(date)}>
-                          <div style={{ display:'flex', alignItems:'center', gap:12 }}>
-                            <div style={{ width:42, height:42, borderRadius:'50%', flexShrink:0, background:'conic-gradient('+col+' '+pct*3.6+'deg,#151530 '+pct*3.6+'deg)', display:'flex', alignItems:'center', justifyContent:'center' }}>
-                              <div style={{ width:30, height:30, borderRadius:'50%', background:'#0A0A1E', display:'flex', alignItems:'center', justifyContent:'center' }}>
-                                <span className="orb" style={{ fontSize:9, color:col }}>{pct}%</span>
-                              </div>
-                            </div>
-                            <div style={{ flex:1 }}>
-                              <div style={{ fontSize:13, fontWeight:500, marginBottom:3, color:'#E0E0F8' }}>
-                                {fmtDate(date)}
-                                {date===todayStr() && <span style={{ marginLeft:8, fontSize:8, color:'#33DDFF', fontFamily:'Orbitron,monospace' }}>TODAY</span>}
-                                {dayNote && <span style={{ marginLeft:8, fontSize:12 }}>{dayNote.mood}</span>}
-                              </div>
-                              <div style={DIM}>{s.completed}/{s.total} · +{s.xpEarned||0} XP{s.xpPenalty>0&&<span style={{ color:'#FF6666' }}> · −{s.xpPenalty} pen</span>}</div>
-                            </div>
-                            <span style={{ color:'#3A3A70', fontSize:11 }}>{isOpen?'▲':'▼'}</span>
-                          </div>
-                        </div>
-                        {isOpen && (
-                          <div style={{ background:'#060616', border:'1px solid #22224A', borderTop:'none', borderRadius:'0 0 10px 10px', padding:'6px 12px 12px', marginTop:-8, marginBottom:8 }}>
-                            {detail
-                              ? detail.map(h => (
-                                  <div key={h.id} style={{ display:'flex', alignItems:'center', gap:9, padding:'7px 0', borderBottom:'1px solid #0E0E28' }}>
-                                    <div style={{ width:18, height:18, borderRadius:4, flexShrink:0, background:h.completed?'#33FF99':'transparent', border:'2px solid '+(h.completed?'#33FF99':'#28285A'), display:'flex', alignItems:'center', justifyContent:'center', fontSize:11, fontWeight:900, color:'#04040C' }}>
-                                      {h.completed?'✓':''}
-                                    </div>
-                                    <span style={{ fontSize:14, flexShrink:0, opacity:h.completed?1:0.25 }}>{h.icon}</span>
-                                    <span style={{ flex:1, fontSize:12, color:h.completed?'#C0C0E8':'#404070', textDecoration:h.completed?'none':'line-through' }}>{h.name}</span>
-                                    {!h.completed && <span style={{ fontSize:10, color:'#FF6666' }}>−{penaltyFor(h.xp)} XP</span>}
-                                  </div>
-                                ))
-                              : <div style={{ ...DIM, textAlign:'center', padding:'12px 0', color:'#404080' }}>Loading…</div>
-                            }
-                            {dayNote && (
-                              <div style={{ marginTop:10, padding:'10px', background:'#0E0E28', borderRadius:8, border:'1px solid #CC77FF25' }}>
-                                <div style={{ display:'flex', gap:8, marginBottom:4 }}>
-                                  <span style={{ fontSize:16 }}>{dayNote.mood}</span>
-                                  <span className="orb" style={{ fontSize:8, color:'#5050A0', letterSpacing:1, alignSelf:'center' }}>JOURNAL</span>
-                                </div>
-                                <div style={{ fontSize:12, color:'#A0A0C8', lineHeight:1.6 }}>{dayNote.text}</div>
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })
-              }
-            </div>
-          </div>
-        )}
 
         {/* ═══════════════════ GOALS ═══════════════════ */}
         {tab==='goals' && (
@@ -1640,7 +1570,7 @@ export default function App() {
               </div>
             </div>
 
-            <button onClick={exportData} style={{ width:'100%', ...BTN('#33FF99','12px 0'), fontSize:11, letterSpacing:2, marginBottom:14 }}>⬇ EXPORT DATA BACKUP</button>
+        
           </div>
         )}
 
@@ -1652,11 +1582,71 @@ export default function App() {
               <div style={{ fontSize:13, color:'#9090C0', marginBottom:16 }}>
                 Signed in as: <span style={{ color:'#33DDFF' }}>{localStorage.getItem('bf_user_name')||'Warrior'}</span>
               </div>
-              <SettingsPanel />
+              <SettingsPanel onShowHistory={() => setShowHistory(true)} onExport={exportData} />
             </div>
           </div>
         )}
       </div>
+
+      {showHistory && (
+        <div style={{ position:'fixed', inset:0, background:'#04040C', zIndex:200, overflowY:'auto', padding:'16px 12px 80px' }}>
+          <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:20 }}>
+            <button onClick={() => setShowHistory(false)} style={{ background:'transparent', border:'1px solid #22224A', borderRadius:8, color:'#33DDFF', padding:'8px 14px', cursor:'pointer', fontFamily:'Orbitron,monospace', fontSize:10 }}>← BACK</button>
+            <span style={{ fontFamily:'Orbitron,monospace', fontSize:12, color:'#7070B0', letterSpacing:2 }}>ALL TIME HISTORY</span>
+          </div>
+          {Object.keys(summary).sort().reverse().map(date => {
+            const s = summary[date];
+            const pct = s.total>0 ? Math.round((s.completed/s.total)*100) : 0;
+            const col = pct===100?'#33FF99':pct>=60?'#33DDFF':pct>=30?'#FF9933':'#FF6666';
+            const isOpen = expandedDate===date;
+            const detail = histDetail[date];
+            const dayNote = notes.find(n => n.date===date);
+            return (
+              <div key={date}>
+                <div className="hr" onClick={() => openHistory(date)}>
+                  <div style={{ display:'flex', alignItems:'center', gap:12 }}>
+                    <div style={{ width:42, height:42, borderRadius:'50%', flexShrink:0, background:'conic-gradient('+col+' '+pct*3.6+'deg,#151530 '+pct*3.6+'deg)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                      <div style={{ width:30, height:30, borderRadius:'50%', background:'#0A0A1E', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                        <span className="orb" style={{ fontSize:9, color:col }}>{pct}%</span>
+                      </div>
+                    </div>
+                    <div style={{ flex:1 }}>
+                      <div style={{ fontSize:13, fontWeight:500, marginBottom:3, color:'#E0E0F8' }}>
+                        {fmtDate(date)}
+                        {date===todayStr() && <span style={{ marginLeft:8, fontSize:8, color:'#33DDFF', fontFamily:'Orbitron,monospace' }}>TODAY</span>}
+                        {dayNote && <span style={{ marginLeft:8, fontSize:12 }}>{dayNote.mood}</span>}
+                      </div>
+                      <div style={{ fontSize:11, color:'#7070A0' }}>{s.completed}/{s.total} · +{s.xpEarned||0} XP{s.xpPenalty>0&&<span style={{ color:'#FF6666' }}> · −{s.xpPenalty} pen</span>}</div>
+                    </div>
+                    <span style={{ color:'#3A3A70', fontSize:11 }}>{isOpen?'▲':'▼'}</span>
+                  </div>
+                </div>
+                {isOpen && (
+                  <div style={{ background:'#060616', border:'1px solid #22224A', borderTop:'none', borderRadius:'0 0 10px 10px', padding:'6px 12px 12px', marginTop:-8, marginBottom:8 }}>
+                    {detail ? detail.map(h => (
+                      <div key={h.id} style={{ display:'flex', alignItems:'center', gap:9, padding:'7px 0', borderBottom:'1px solid #0E0E28' }}>
+                        <div style={{ width:18, height:18, borderRadius:4, flexShrink:0, background:h.completed?'#33FF99':'transparent', border:'2px solid '+(h.completed?'#33FF99':'#28285A'), display:'flex', alignItems:'center', justifyContent:'center', fontSize:11, fontWeight:900, color:'#04040C' }}>{h.completed?'✓':''}</div>
+                        <span style={{ fontSize:14, flexShrink:0, opacity:h.completed?1:0.25 }}>{h.icon}</span>
+                        <span style={{ flex:1, fontSize:12, color:h.completed?'#C0C0E8':'#404070', textDecoration:h.completed?'none':'line-through' }}>{h.name}</span>
+                        {!h.completed && <span style={{ fontSize:10, color:'#FF6666' }}>−{penaltyFor(h.xp)} XP</span>}
+                      </div>
+                    )) : <div style={{ fontSize:11, color:'#404080', textAlign:'center', padding:'12px 0' }}>Loading…</div>}
+                    {dayNote && (
+                      <div style={{ marginTop:10, padding:'10px', background:'#0E0E28', borderRadius:8, border:'1px solid #CC77FF25' }}>
+                        <div style={{ display:'flex', gap:8, marginBottom:4 }}>
+                          <span style={{ fontSize:16 }}>{dayNote.mood}</span>
+                          <span className="orb" style={{ fontSize:8, color:'#5050A0', letterSpacing:1, alignSelf:'center' }}>JOURNAL</span>
+                        </div>
+                        <div style={{ fontSize:12, color:'#A0A0C8', lineHeight:1.6 }}>{dayNote.text}</div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* ─────────────────── BOTTOM NAV ─────────────────── */}
       <nav style={{ position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)', width:'100%', maxWidth:480, background:'#060616', borderTop:'1px solid #14143A', display:'flex', zIndex:100, paddingBottom:'env(safe-area-inset-bottom)' }}>
