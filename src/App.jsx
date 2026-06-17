@@ -218,7 +218,7 @@ function buildShareCard(player, habits) {
     ctx.beginPath(); ctx.roundRect(22,y-7,14,14,3); ctx.stroke();
     if (h.completed) { ctx.fillStyle = col+"25"; ctx.fill(); }
     ctx.fillStyle = col; ctx.font = "bold 10px 'Courier New',monospace"; ctx.textAlign = "center";
-    ctx.fillText(h.completed?"v":"x", 29, y+3);
+    ctx.fillText(h.completed ? "✓" : "✗", 29, y+3);
     ctx.textAlign = "left";
     ctx.fillStyle = h.completed ? "#E0E0FF" : "#9090C0";
     ctx.font = "11px 'Courier New',monospace";
@@ -535,7 +535,7 @@ export default function App() {
   const saveBodyLog = async () => {
     const entry = { date:todayStr(), reps:todayReps, run:todayRun, sleep:todaySleep };
     const upd   = [...bodyLog.filter(b => b.date!==todayStr()), entry];
-    setBodyLog(upd); await safeSet('bf_body', upd); flash('BODY LOG SAVED', '#FF6666');
+    setBodyLog(upd); await safeSet('bf_body', upd); flash('FITNESS LOG SAVED', '#FF6666');
   };
 
   // ── Notes ─────────────────────────────────────────────────────────────────────
