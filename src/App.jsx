@@ -1385,7 +1385,11 @@ export default function App() {
                   </div>
                 )}
                 <div style={{ fontSize:13, lineHeight:1.75, color:'#C8C8E8', whiteSpace:'pre-wrap' }}>{n.text}</div>
-              </div>
+                </div>
+            ))}
+          </div>
+        )}
+
 
         {/* ═══════════════════ GOALS ═══════════════════ */}
         {tab==='goals' && (
