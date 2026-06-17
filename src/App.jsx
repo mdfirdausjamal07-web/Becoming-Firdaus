@@ -251,6 +251,7 @@ export default function App() {
   const [notif,        setNotif]        = useState(null);
   const [penWarn,      setPenWarn]      = useState(null);
   const [shareImg,     setShareImg]     = useState(null);
+  const [longPressId, setLongPressId] = useState(null);
   const [loading,      setLoading]      = useState(true);
 
   const [addOpen, setAddOpen] = useState(false);
