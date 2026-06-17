@@ -1608,6 +1608,7 @@ export default function App() {
             const isOpen = expandedDate===date;
             const detail = histDetail[date];
             const dayNote = notes.find(n => n.date===date);
+            const dayFitness = bodyLog.find(b => b.date===date);
             return (
               <div key={date}>
                 <div className="hr" onClick={() => openHistory(date)}>
@@ -1638,6 +1639,28 @@ export default function App() {
                         {!h.completed && <span style={{ fontSize:10, color:'#FF6666' }}>−{penaltyFor(h.xp)} XP</span>}
                       </div>
                     )) : <div style={{ fontSize:11, color:'#404080', textAlign:'center', padding:'12px 0' }}>Loading…</div>}
+                    {dayFitness && (
+                      <div style={{ marginTop:10, padding:'10px', background:'#0E0E28', borderRadius:8, border:'1px solid #FF666625' }}>
+                        <div className="orb" style={{ fontSize:8, color:'#FF6666', letterSpacing:2, marginBottom:8 }}>💪 FITNESS</div>
+                        <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
+                          {dayFitness.run && dayFitness.run.distance && (
+                            <div style={{ fontSize:11, color:'#33FF99', background:'#33FF9910', borderRadius:6, padding:'4px 8px' }}>
+                              🏃 {dayFitness.run.distance}km {dayFitness.run.time&&'· '+dayFitness.run.time}
+                            </div>
+                          )}
+                          {dayFitness.sleep && dayFitness.sleep.bed && (
+                            <div style={{ fontSize:11, color:'#33DDFF', background:'#33DDFF10', borderRadius:6, padding:'4px 8px' }}>
+                              😴 {dayFitness.sleep.bed}→{dayFitness.sleep.wake}
+                            </div>
+                          )}
+                          {dayFitness.reps && Object.entries(dayFitness.reps).filter(([,v])=>Number(v)>0).map(([ex,val]) => (
+                            <div key={ex} style={{ fontSize:11, color:'#FF6666', background:'#FF666610', borderRadius:6, padding:'4px 8px' }}>
+                              {ex}: {val}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                     {dayNote && (
                       <div style={{ marginTop:10, padding:'10px', background:'#0E0E28', borderRadius:8, border:'1px solid #CC77FF25' }}>
                         <div style={{ display:'flex', gap:8, marginBottom:4 }}>
