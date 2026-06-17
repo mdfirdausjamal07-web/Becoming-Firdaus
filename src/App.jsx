@@ -179,8 +179,7 @@ function buildShareCard(player, habits) {
   ctx.textAlign = "left";
   ctx.fillStyle = "#F0F0FF"; ctx.font = "bold 14px 'Courier New',monospace";
   ctx.fillText(localStorage.getItem("bf_user_name") || "Warrior", 86, y+14);
-  ctx.fillStyle = "#303065"; ctx.font = "9px 'Courier New',monospace";
-  ctx.fillText("DAY "+getDayOfWar(player.firstDate)+" · THE INNER WAR", 86, y+44);
+
   ctx.fillStyle = rank.color; ctx.font = "10px 'Courier New',monospace";
   ctx.fillText(rank.name+"-Rank Warrior", 86, y+30);
 
@@ -207,6 +206,10 @@ function buildShareCard(player, habits) {
   y += 16; ctx.strokeStyle = "#202045"; ctx.lineWidth = 1;
   ctx.beginPath(); ctx.moveTo(20,y); ctx.lineTo(BW-20,y); ctx.stroke();
   y += 14;
+  ctx.fillStyle = "#303065"; ctx.font = "bold 10px 'Courier New',monospace"; ctx.textAlign = "center";
+  ctx.fillText("— DAY "+getDayOfWar(player.firstDate)+" · THE INNER WAR —", BW/2, y);
+  ctx.textAlign = "left";
+  y += 16;
 
   ctx.fillStyle = "#5050A0"; ctx.font = "bold 9px 'Courier New',monospace"; ctx.textAlign = "left";
   ctx.fillText("DAILY QUESTS", 20, y);
@@ -768,7 +771,7 @@ export default function App() {
               <a href={shareImg} download={'becoming-firdaus-'+todayStr()+'.png'} style={{ flex:1, ...BTN('#33DDFF'), display:'block', textAlign:'center', textDecoration:'none' }}>↓ SAVE IMAGE</a>
               <button onClick={() => setShareImg(null)} style={{ flex:1, ...BTN('#505090') }}>CLOSE</button>
             </div>
-            <div style={{ ...DIM, textAlign:'center' }}>Mobile: long-press image → Save to Photos</div>
+
           </div>
         </div>
       )}
