@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { initializeApp, getApps } from "firebase/app";
-import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { getAuth, GoogleAuthProvider, signInWithPopup, browserPopupRedirectResolver } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: 'AIzaSyDU6kehstWmNktdHSI04iv8wHwci-JcWB8',
@@ -28,7 +28,7 @@ export default function GoogleAuth({ onSignedIn }) {
       const auth = getAuth(app);
       const provider = new GoogleAuthProvider();
       provider.setCustomParameters({ prompt: 'select_account' });
-      const result = await signInWithPopup(auth, provider);
+      const result = await signInWithPopup(auth, provider, browserPopupRedirectResolver);
       const token = await result.user.getIdToken();
       localStorage.setItem('bf_google_uid', result.user.uid);
       localStorage.setItem('bf_google_token', token);
@@ -37,7 +37,7 @@ export default function GoogleAuth({ onSignedIn }) {
       setStep('name');
     } catch (e) {
       if (e.code !== 'auth/popup-closed-by-user') {
-        setError('Sign-in failed. Try again.');
+        setError('Sign-in failed: ' + e.code);
       }
     }
     setLoading(false);
