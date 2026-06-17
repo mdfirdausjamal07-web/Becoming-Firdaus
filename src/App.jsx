@@ -894,14 +894,17 @@ export default function App() {
                       {h.sub && <div style={{ ...DIM, marginTop:2, lineHeight:1.4 }}>{h.sub}</div>}
                       <div style={{ fontSize:10, color:SC[h.stat], marginTop:3 }}>{h.stat} +2 · +{h.xp} XP · <span style={{ color:'#884444' }}>miss=−{penaltyFor(h.xp)}</span></div>
                     </div>
-                    {longPressId===h.id && (
-                      <div style={{ display:'flex', alignItems:'center', gap:4 }}>
-                        <button onClick={() => moveHabit(h.id,-1)} style={{ background:'transparent', border:'none', color:idx===0?'#1A1A38':'#5050A0', cursor:'pointer', fontSize:11, padding:'1px 4px' }}>▲</button>
-                        <button onClick={() => moveHabit(h.id,1)} style={{ background:'transparent', border:'none', color:idx===habits.length-1?'#1A1A38':'#5050A0', cursor:'pointer', fontSize:11, padding:'1px 4px' }}>▼</button>
-                        <button onClick={() => openEdit(h)} style={{ background:'transparent', border:'none', color:'#33DDFF', cursor:'pointer', fontSize:13, padding:'2px 6px' }}>✎</button>
-                        <button onClick={() => removeHabit(h.id)} style={{ background:'transparent', border:'none', color:'#FF6666', cursor:'pointer', fontSize:18, padding:'2px 4px' }}>×</button>
-                      </div>
-                    )}
+                    <div style={{ position:'relative' }}>
+                      <button onClick={() => setLongPressId(longPressId===h.id?null:h.id)} style={{ background:'transparent', border:'none', color:'#5050A0', cursor:'pointer', fontSize:18, padding:'2px 8px', lineHeight:1 }}>⋮</button>
+                      {longPressId===h.id && (
+                        <div style={{ position:'absolute', right:0, top:24, background:'#0E0E28', border:'1px solid #22224A', borderRadius:10, zIndex:50, minWidth:140, boxShadow:'0 8px 24px rgba(0,0,0,0.5)' }}>
+                          <button onClick={()=>{moveHabit(h.id,-1);setLongPressId(null);}} style={{ display:'block', width:'100%', background:'transparent', border:'none', borderBottom:'1px solid #1A1A38', color:'#9090C0', cursor:'pointer', padding:'10px 14px', textAlign:'left', fontSize:12 }}>▲ Move Up</button>
+                          <button onClick={()=>{moveHabit(h.id,1);setLongPressId(null);}} style={{ display:'block', width:'100%', background:'transparent', border:'none', borderBottom:'1px solid #1A1A38', color:'#9090C0', cursor:'pointer', padding:'10px 14px', textAlign:'left', fontSize:12 }}>▼ Move Down</button>
+                          <button onClick={()=>{openEdit(h);setLongPressId(null);}} style={{ display:'block', width:'100%', background:'transparent', border:'none', borderBottom:'1px solid #1A1A38', color:'#33DDFF', cursor:'pointer', padding:'10px 14px', textAlign:'left', fontSize:12 }}>✎ Edit</button>
+                          <button onClick={()=>{removeHabit(h.id);setLongPressId(null);}} style={{ display:'block', width:'100%', background:'transparent', border:'none', color:'#FF6666', cursor:'pointer', padding:'10px 14px', textAlign:'left', fontSize:12 }}>🗑 Remove</button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
