@@ -893,12 +893,14 @@ export default function App() {
                       {h.sub && <div style={{ ...DIM, marginTop:2, lineHeight:1.4 }}>{h.sub}</div>}
                       <div style={{ fontSize:10, color:SC[h.stat], marginTop:3 }}>{h.stat} +2 · +{h.xp} XP · <span style={{ color:'#884444' }}>miss=−{penaltyFor(h.xp)}</span></div>
                     </div>
-                    <div style={{ display:'flex', flexDirection:'column', gap:1 }}>
-                      <button onClick={() => moveHabit(h.id,-1)} style={{ background:'transparent', border:'none', color:idx===0?'#1A1A38':'#5050A0', cursor:'pointer', fontSize:11, padding:'1px 4px' }}>▲</button>
-                      <button onClick={() => moveHabit(h.id,1)} style={{ background:'transparent', border:'none', color:idx===habits.length-1?'#1A1A38':'#5050A0', cursor:'pointer', fontSize:11, padding:'1px 4px' }}>▼</button>
-                    </div>
-                    <button onClick={() => openEdit(h)} style={{ background:'transparent', border:'none', color:'#5050A0', cursor:'pointer', fontSize:13, padding:'2px 6px' }}>✎</button>
-                    <button onClick={() => removeHabit(h.id)} style={{ background:'transparent', border:'none', color:'#282850', cursor:'pointer', fontSize:18, padding:'2px 4px' }}>×</button>
+                    {longPressId===h.id && (
+                      <div style={{ display:'flex', alignItems:'center', gap:4 }}>
+                        <button onClick={() => moveHabit(h.id,-1)} style={{ background:'transparent', border:'none', color:idx===0?'#1A1A38':'#5050A0', cursor:'pointer', fontSize:11, padding:'1px 4px' }}>▲</button>
+                        <button onClick={() => moveHabit(h.id,1)} style={{ background:'transparent', border:'none', color:idx===habits.length-1?'#1A1A38':'#5050A0', cursor:'pointer', fontSize:11, padding:'1px 4px' }}>▼</button>
+                        <button onClick={() => openEdit(h)} style={{ background:'transparent', border:'none', color:'#33DDFF', cursor:'pointer', fontSize:13, padding:'2px 6px' }}>✎</button>
+                        <button onClick={() => removeHabit(h.id)} style={{ background:'transparent', border:'none', color:'#FF6666', cursor:'pointer', fontSize:18, padding:'2px 4px' }}>×</button>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

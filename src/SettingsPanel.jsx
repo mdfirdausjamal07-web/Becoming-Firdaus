@@ -20,6 +20,8 @@ export default function SettingsPanel() {
     window.location.reload();
   };
 
+  const [confirmSignOut, setConfirmSignOut] = useState(false);
+
   const handleSignOut = () => {
     localStorage.clear();
     window.location.reload();
@@ -54,9 +56,17 @@ export default function SettingsPanel() {
         <div style={{ fontSize:12, color:'#606090', marginBottom:12 }}>
           UID: <span style={{ color:'#303060', fontSize:10 }}>{uid?.slice(0,16)}...</span>
         </div>
-        <button onClick={handleSignOut} style={{ ...BTN('#FF6666'), width:'100%' }}>
-          🚪 SIGN OUT
-        </button>
+        {confirmSignOut ? (
+          <div>
+            <div style={{ fontSize:12, color:'#FF6666', marginBottom:10, textAlign:'center' }}>Are you sure you want to sign out?</div>
+            <div style={{ display:'flex', gap:8 }}>
+              <button onClick={handleSignOut} style={{ ...BTN('#FF6666'), flex:1 }}>YES, SIGN OUT</button>
+              <button onClick={()=>setConfirmSignOut(false)} style={{ ...BTN('#505090'), flex:1 }}>CANCEL</button>
+            </div>
+          </div>
+        ) : (
+          <button onClick={()=>setConfirmSignOut(true)} style={{ ...BTN('#FF6666'), width:'100%' }}>🚪 SIGN OUT</button>
+        )}
       </div>
 
       <div style={{ ...CARD, textAlign:'center' }}>
